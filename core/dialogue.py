@@ -8,10 +8,10 @@ import webbrowser
 import random
 import os
 
-import app.modules.core.logic.config as config
-import app.modules.audio.audio_detection as a_d
-import app.modules.audio.audio_speaking as a_s
-from app.modules.core.state_interface import StateInterface
+import core.configuration as config
+import core.audio_detection as a_d
+import core.audio_speaking as a_s
+from core.state_interface import StateInterface
 
 
 # voice command reading function

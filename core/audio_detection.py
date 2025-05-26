@@ -7,10 +7,10 @@ import sounddevice as sd
 import queue
 import json
 
-import app.modules.core.logic.config as config
+import core.configuration as config
 
 # speech recognition model
-model: vosk.Model = vosk.Model("model_small")
+model: vosk.Model = vosk.Model("model")
 samplerate = 16000
 
 q = queue.Queue()

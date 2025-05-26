@@ -14,11 +14,11 @@ import webbrowser
 import time
 import sys
 
-import app.modules.core.logic.config as config
-import app.modules.graphics.gui as gui
-import app.modules.core.logic.dialogue as dialogue
-import app.modules.audio.audio_detection as audio_detection
-import app.modules.audio.audio_speaking as audio_speaking
+import core.configuration as conf
+import core.gui as gui
+import core.dialogue as dialogue
+import core.audio_detection as audio_detection
+import core.audio_speaking as audio_speaking
 
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
@@ -62,9 +62,9 @@ def main():
     start: float = time.time()
 
     # read data from the configuration file
-    conf: ConfigParser = configparser.ConfigParser()
-    conf.read("../../../etc/config.ini")
-    api_key: str = conf['DEFAULT']['Api_key']
+    conf_ini: ConfigParser = configparser.ConfigParser()
+    conf_ini.read("configuration.ini")
+    api_key: str = conf_ini['DEFAULT']['Api_key']
 
     # initializing an OpenAI client
     client: OpenAI = OpenAI(
@@ -108,14 +108,14 @@ def main():
 
     # fix the browser path
     webbrowser.register(
-        config.BASE_BROWSER,
+        conf.BASE_BROWSER,
         None,
-        webbrowser.BackgroundBrowser(config.CHROME_PATH)
+        webbrowser.BackgroundBrowser(conf.CHROME_PATH)
     )
 
     # output debugging information
     print(
-        f"{config.VA_NAME} (v{config.VA_VERSION}) начал свою работу ...\n"
+        f"{conf.VA_NAME} (v{conf.VA_VERSION}) начал свою работу ...\n"
         f"Api key: {api_key}\n"
         f"OpenAI client: {client}\n"
         f"Mod = {mod}\n"
@@ -127,7 +127,7 @@ def main():
 
     # starting the voice assistant
     audio_speaking.va_speak(
-        random.choice(config.GREETING_LIST)
+        random.choice(conf.GREETING_LIST)
     )  # greeting at startup
     audio_detection.va_listen(
         dialogue.va_respond,
