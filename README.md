@@ -15,15 +15,16 @@ Used neural networks:
    - Silero TTS
 
 ## To run the program(Windows)
-For start, you need Python version 3.0 and higher.
-To compile the project you should create python project venv and build it with ```pip install -r requirements.txt``` command.
-Then you need to install num2t4ru library. Actual version you can find at this link: https://github.com/Yuego/num2t4ru?ysclid=mayb995m44884371024
-Also, you should download model of Vosk to ```app\modules\core\logic``` folder.
-You can get the latest from the official website.
-The one I was using is small.
-Run ```app\modules\core\logic\main.py```
-Also, check ```app\etc\config.ini.example``` and ```app\modules\core\logic\config.py``` and set required values (api key in ```config.ini```, device index in ```config.py```). ```config.ini.example``` you need rename to ```config.ini```. 
-It will also work without an api key, but worse because it uses a free model. Without the Internet, it will recognize commands, but will not be able to access the OpenAI api key.
+For start, you need Git & Python >=3.10.
+
+```
+git clone https://github.com/Gleb-a-p/NeuralWaifu.git       // clone repo
+cd NeuralWaifu                                              // mv into cloned repo
+python -m venv .venv                                        // create .venv
+.venv/Scripts/activate.bat                                  // activate .venv
+pip install -r requirements.txt                             // install requirements
+python main.py                                              // run program
+```
 
 ## Supported Languages
 Currently, only Russian language is supported.
