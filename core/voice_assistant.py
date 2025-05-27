@@ -3,14 +3,17 @@
 from fuzzywuzzy import fuzz
 import vosk
 import sys
-import sounddevice as sd
+import sounddevice
 import queue
 import json
+import logging
+import time
+import torch
 
 import core.configuration as config
 
 # speech recognition model
-model: vosk.Model = vosk.Model("model")
+model: vosk.Model = vosk.Model("./core/model/")
 samplerate = 16000
 
 q = queue.Queue()
@@ -24,7 +27,7 @@ def q_callback(indata, frames, time, status):
 
 # microphone listening function
 def va_listen(callback, client, dialog, mod):
-    with sd.RawInputStream(
+    with sounddevice.RawInputStream(
             samplerate=samplerate,
             blocksize=8000,
             device=config.DEVICE,
@@ -69,3 +72,55 @@ def va_wake_word_detection(message: str) -> str:
             print(f"Модель распознала следующее обращение: {ask}")
             return ask
     return ''
+
+logger = logging.getLogger(__name__)
+
+
+class TTS:
+    def __init__(self,
+                 device: str = "cpu",
+                 sample_rate: int = 48000,
+                 speaker: str = "aidar") -> None:
+        self.device = torch.device(device)
+        self.sample_rate = sample_rate
+        self.speaker = speaker
+        try:
+            self.model, _ = torch.hub.load(
+                repo_or_dir="snakers4/silero-models",
+                model="silero_tts",
+                language="ru",
+                speaker="ru_v3"
+            )
+            self.model.to(self.device)
+            logger.info("Silero TTS model loaded successfully.")
+        except Exception as e:
+            logger.exception("Failed to load Silero TTS model.")
+            raise RuntimeError("TTS initialization failed.") from e
+
+    def va_speak(self, text: str, speaker: str = "aidar") -> None:
+        if not text.strip():
+            logger.warning("Empty text provided to TTS.")
+            return
+        try:
+            audio = self.model.apply_tts(
+                text=f"{text}..",
+                speaker=speaker or self.speaker,
+                sample_rate=self.sample_rate,
+                put_accent=True,
+                put_yo=True
+            )
+            logger.debug(f"Generated audio for: {text}")
+        except Exception as e:
+            logger.exception("TTS synthesis failed.")
+            return
+        try:
+            duration = len(audio) / self.sample_rate
+            sounddevice.play(audio, int(self.sample_rate * 1.05))
+            time.sleep(duration + 0.5)
+            logger.info("Audio playback completed.")
+        except KeyboardInterrupt:
+            logger.info("Playback interrupted by user.")
+        except Exception as e:
+            logger.exception("Audio playback failed.")
+        finally:
+            sounddevice.stop()

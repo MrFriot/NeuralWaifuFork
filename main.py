@@ -13,12 +13,12 @@ import configparser
 import webbrowser
 import time
 import sys
+import logging
 
 import core.configuration as conf
 import core.gui as gui
 import core.dialogue as dialogue
-import core.audio_detection as audio_detection
-import core.audio_speaking as audio_speaking
+import core.voice_assistant as va
 
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
@@ -124,12 +124,13 @@ def main():
 
     # starting the event loop
     app.exec()
-
+    logging.basicConfig(level=logging.DEBUG)
     # starting the voice assistant
-    audio_speaking.va_speak(
+    tts = va.TTS()
+    tts.va_speak(
         random.choice(conf.GREETING_LIST)
     )  # greeting at startup
-    audio_detection.va_listen(
+    va.va_listen(
         dialogue.va_respond,
         client,
         dialogue_history,

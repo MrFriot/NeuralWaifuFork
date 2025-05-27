@@ -9,15 +9,16 @@ import random
 import os
 
 import core.configuration as config
-import core.audio_detection as a_d
-import core.audio_speaking as a_s
+import core.voice_assistant as va
 from core.state_interface import StateInterface
+
+tts = va.TTS()  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 # voice command reading function
 def va_respond(message: str, client, dialogue_history, mod) -> None:
     print(message)
-    detected_message = a_d.va_wake_word_detection(message)
+    detected_message = va.va_wake_word_detection(message)
     if detected_message:
         if message:
             print(message)
@@ -33,7 +34,7 @@ def va_respond(message: str, client, dialogue_history, mod) -> None:
         ):
             if mod == "base":
                 try:
-                    a_s.va_speak(generate_response(
+                    tts.va_speak(generate_response(
                         dialogue_history,
                         message,
                         mod,
@@ -43,7 +44,7 @@ def va_respond(message: str, client, dialogue_history, mod) -> None:
                     print(err)
             elif mod == "free":
                 try:
-                    a_s.va_speak(generate_response(
+                    tts.va_speak(generate_response(
                         dialogue_history=dialogue_history,
                         message=message,
                         mod=mod
@@ -125,10 +126,10 @@ def execute_cmd(cmd: str) -> None:
             case "turn_off_music":
                 pass
             case "poweroff":
-                a_s.va_speak(random.choice(config.POWEROFF_MESSAGE_LIST))
+                tts.va_speak(random.choice(config.POWEROFF_MESSAGE_LIST))
                 exit()
     print(f"Ответ от {config.VA_NAME}: {text}")
-    a_s.va_speak(text)
+    tts.va_speak(text)
 
 
 # response correction function
